@@ -20,6 +20,39 @@ public class JDBCJournalDao implements JournalDao {
     JDBCUserDao userDao = new JDBCUserDao();
     JDBCCourseDao courseDao = new JDBCCourseDao();
 
+    public static int getTeacherIdByCourseId (long courseId) throws DBException {
+        int returnId = 0;
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(SQLConstants.GET_TEACHER_ID_BY_COURSE_ID)) {
+            pstmt.setLong(1, courseId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next())   {
+                returnId = rs.getInt("teacher_id");
+            }
+            return returnId;
+        } catch (SQLException e) {
+            logger.error("There was an error", e);
+            throw new DBException("Failed to find entity", e);
+        }
+    }
+
+    public static boolean savePreviousTeacher (int courseId, int teacherId) throws DBException {
+        boolean result = false;
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(SQLConstants.SAVE_PREVIOUS_TEACHER);) {
+            pstmt.setInt(1, courseId);
+            pstmt.setInt(2, teacherId);
+            result = pstmt.executeUpdate() > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            logger.error("There was an error", e);
+            throw new DBException("Entity already exists", e);
+        } catch (SQLException e) {
+            logger.error("There was an error", e);
+            throw new DBException("Unexpected database error", e);
+        }
+        return result;
+    }
+
     public static int getCourseTeacherIdByCourseId (long id) throws DBException {
         int returnId = 0;
         try (Connection connection = ConnectionPool.getConnection();

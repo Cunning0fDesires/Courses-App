@@ -22,6 +22,7 @@ public class CommandContainer {
         commands.put("changeLanguage", new ChangeLanguageCommand());
         commands.put("attachCourse", new AttachCourseCommand());
         commands.put("registerForCourse", new CourseRegisterCommand());
+        commands.put("sortAdmin", new SortCourseAdminCommand());
 
 
 

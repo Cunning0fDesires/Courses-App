@@ -19,7 +19,9 @@ public class AddCourseCommand extends Command {
     @Override
     public CommandResponse execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String name = request.getParameter("course_name");
-        int topic = 0;
+        String topic = request.getParameter("topic");
+        int topicId = 0;
+
         LocalDate startDate = LocalDate.parse(request.getParameter("start_date"));
         LocalDate endDate = LocalDate.parse(request.getParameter("end_date"));
 
@@ -49,14 +51,14 @@ public class AddCourseCommand extends Command {
         }
         if (allTopics.contains(topic)){
             try {
-                topic = JDBCCourseDao.getTopicIdByName(request.getParameter("topic"));
+                topicId = JDBCCourseDao.getTopicIdByName(request.getParameter("topic"));
             } catch (DBException e) {
                 e.printStackTrace();
             }
         } else {
             try {
                 JDBCCourseDao.addNewTopic(request.getParameter("topic"));
-                topic = JDBCCourseDao.getTopicIdByName(request.getParameter("topic"));
+                topicId = JDBCCourseDao.getTopicIdByName(request.getParameter("topic"));
 
             } catch (DBException e) {
                 e.printStackTrace();
@@ -70,7 +72,7 @@ public class AddCourseCommand extends Command {
             e.printStackTrace();
         }
         courseToBeAdded.setName(name);
-        courseToBeAdded.setTopicId(topic);
+        courseToBeAdded.setTopicId(topicId);
         courseToBeAdded.setStartDate(startDate);
         courseToBeAdded.setEndDate(endDate);
 

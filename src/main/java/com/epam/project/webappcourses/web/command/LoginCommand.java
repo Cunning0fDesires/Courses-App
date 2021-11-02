@@ -96,20 +96,8 @@ public class LoginCommand extends Command {
         else if (userRole == Role.TEACHER)
             forward = processTeacher(user, session);
         else if (userRole == Role.ADMIN)
-            forward = processAdmin(user, session);
+            forward = processAdmin(user, session, request);
 
-//             work with i18n
-//            String userLocaleName = user.getLocaleName();
-//            log.trace("userLocalName --> " + userLocaleName);
-//
-//            if (userLocaleName != null && !userLocaleName.isEmpty()) {
-//                Config.set(session, "javax.servlet.jsp.jstl.fmt.locale", userLocaleName);
-//
-//                session.setAttribute("defaultLocale", userLocaleName);
-//                log.trace("Set the session attribute: defaultLocaleName --> " + userLocaleName);
-//
-//                log.info("Locale for user: defaultLocale --> " + userLocaleName);
-//            }
         log.debug("Command finished");
         return new CommandResponse(CommandResponse.DispatchType.FORWARD, forward);
     }
@@ -142,6 +130,10 @@ public class LoginCommand extends Command {
             List<Course> onGoingCourses = JDBCCourseDao.getCoursesInProgress(user.getId());
 
             for (Course course : onGoingCourses) {
+                List<String> prevTeachers = JDBCCourseDao.getPreviousTeachersByCourseId(course.getId());
+                StringBuilder teachers = new StringBuilder();
+
+
                 CourseTableRow row = new CourseTableRow();
                 row.setName(JDBCCourseDao.getCourseDescription(course.getId(), lang).getName());
                 row.setGrade(JDBCJournalDao.getGradeByStudentAndCourse(user.getId(), course.getId()));
@@ -230,7 +222,9 @@ public class LoginCommand extends Command {
         return coursesJournalRows;
     }
 
-    private String processAdmin(User user, HttpSession session) {
+    private String processAdmin(User user, HttpSession session, HttpServletRequest request) {
+        String lang = (String) session.getAttribute("lang");
+
         List<TeacherCourseTableRow> allTeachersWithCoursesList = new ArrayList<>();
         List<CoursesTableForAdminRow> allCourses = new ArrayList<>();
         List<StudentStatusTableRow> allStudentsWithStatus = new ArrayList<>();
@@ -247,10 +241,16 @@ public class LoginCommand extends Command {
         } catch (DBException e) {
             e.printStackTrace();
         }
-        session.setAttribute("allTeachersWithCoursesList", allTeachersWithCoursesList);
+       session.setAttribute("allTeachersWithCoursesList", allTeachersWithCoursesList);
         session.setAttribute("allCourses", allCourses);
-        session.setAttribute("allStudentsWithStatus", allStudentsWithStatus);
-        session.setAttribute("allTeachers", allTeachers);
+       session.setAttribute("allStudentsWithStatus", allStudentsWithStatus);
+       session.setAttribute("allTeachers", allTeachers);
+
+        request.setAttribute("allTeachersWithCoursesList", allTeachersWithCoursesList);
+        request.setAttribute("allStudentsWithStatus", allStudentsWithStatus);
+        request.setAttribute("allCourses", allCourses);
+        request.setAttribute("allTeachers", allTeachers);
+
 
         return Path.ADMIN_ACCOUNT;
     }

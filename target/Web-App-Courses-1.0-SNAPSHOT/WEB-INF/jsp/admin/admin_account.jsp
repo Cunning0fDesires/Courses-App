@@ -2,8 +2,25 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+
 <html>
 <head>
+    <script
+            src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $("#sortbutton").click(function () {
+                $("#courses_list").hide();
+                $("#sorted_courses_list").show();
+            });
+        });
+    </script>
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <title>Admin account</title>
 </head>
@@ -14,7 +31,7 @@
 </div>
 
 <a href="<%=request.getContextPath()%>/controller?command=logout"><button class="GFG" style="position: absolute; top:25px; right:20px; height:30px;width:70px">
-    Logout
+Log out
 </button></a>
 
 <a href="/addteacher"><button class="GFG" style="position: absolute; top:150px; left:600px; height:30px;width:120px">
@@ -52,7 +69,6 @@
     <%
         session.getAttribute("allTeachers");
         session.getAttribute("allCourses");
-
     %>
     <select name="teacher" id="teacherId">
         <c:forEach items="${allTeachers}" var="teacher">
@@ -90,7 +106,7 @@
         </table>
 
 
-        <table id="courses" border="1" >
+        <table id="courses_list" border="1" >
             <caption>Courses</caption>
             <tr>
                 <th>id</th>
@@ -132,6 +148,47 @@
             <tr>
                 </c:forEach>
         </table>
+
+
+    <table id="sorted_courses_list" border="1" style="display:none;" >
+        <caption>Courses</caption>
+        <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>topic</th>
+            <th>start date</th>
+            <th>end date</th>
+        </tr>
+        <%
+            session.getAttribute("sortedCourses");
+        %>
+        <c:forEach items="${sortedCourses}" var="course">
+        <tr>
+            <td><c:out value="${course.id}"/></td>
+            <td><c:out value="${course.name}"/></td>
+            <td><c:out value="${course.topic}"/></td>
+            <td><c:out value="${course.startDate}"/></td>
+            <td><c:out value="${course.endDate}"/></td>
+        <tr>
+            </c:forEach>
+    </table>
+
+    <input type="button" id="sortbutton" name="sorted_courses" value="See a sorted table"/>
+
+<form align="center" action="controller"  method="post">
+    <input type="hidden" name="command" value="sortAdmin"/>
+    <table align="center" style="with:50%;">
+    <tr>
+        <td>Start date</td>
+        <td><input type="date" name="start_date_filter" /></td>
+    </tr>
+    <tr>
+        <td>End date</td>
+        <td><input type="date" name="end_date_filter" /></td>
+    </tr>
+</table>
+    <input align="center" type="submit" value="Sort" />
+</form>
 
 
 </body>

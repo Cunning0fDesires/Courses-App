@@ -8,11 +8,11 @@
 
 <html>
 <head>
-    <title>Teacher Journal</title>
+    <title><fmt:message key="label.journal"/></title>
 </head>
 <body>
 
-<h1 align="center">Journal</h1>
+<h1 align="center"><fmt:message key="label.journal"/></h1>
 
 <c:set var="logoutUrl" value="${pageContext.request.contextPath}/controller?command=logout"/>
 <a href="${logoutUrl}"><button class="GFG" style="position: absolute; top:25px; right:20px; height:30px;width:70px">
@@ -30,7 +30,7 @@
             <option value="${language.shortName}" ${lang == language.shortName ? 'selected' : ''}><c:out value="${language.fullName}"/></option>
         </c:forEach>
     </select>
-    <input type="submit" value="Apply changes"/>
+    <input type="submit" value="<fmt:message key="button.apply.changed"/>"/>
 </form>
 
 <form id="updateJournal" action="controller" method="post">
@@ -70,7 +70,7 @@
     </c:forEach>
 </form>
 
-<h1 align="center">History</h1>
+<h1 align="center"><fmt:message key="label.history"/></h1>
     <c:forEach items="${readonlyCoursesJournalRows}" var="mapEntry" varStatus="mapEntryLoop">
         <c:set var="course" value="${mapEntry.key}"/>
         <table border="1" style="margin-top:60px; margin-left:300px; width:900px;">

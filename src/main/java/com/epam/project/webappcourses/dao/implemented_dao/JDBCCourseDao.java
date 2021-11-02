@@ -24,6 +24,39 @@ public class JDBCCourseDao implements CourseDao {
     final static Logger logger = Logger.getLogger(JDBCCourseDao.class);
     static CourseMapper courseMapper = new CourseMapper();
 
+    public static List<String> getPreviousTeachersByCourseId(int courseId) throws DBException {
+        List <String> prevTeachers = new ArrayList<>();
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(SQLConstants.GET_PREVIOUS_TEACHERS)) {
+            pstmt.setInt(1, courseId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next())   {
+                prevTeachers.add(rs.getString("teacher"));
+            }
+            return prevTeachers;
+        } catch (SQLException e) {
+            logger.error("There was an error", e);
+            throw new DBException("Failed to find entity", e);
+        }
+    }
+
+    public static boolean changeTeacherForCourse (int teacherId, int courseId) throws DBException {
+        boolean result = false;
+        try (Connection connection = ConnectionPool.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(SQLConstants.CHANGE_TEACHER_FOR_COURSE);) {
+            pstmt.setInt(1, teacherId);
+            pstmt.setInt(2, courseId);
+            result = pstmt.executeUpdate() > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            logger.error("There was an error", e);
+            throw new DBException("Couldn't change a teacher", e);
+        } catch (SQLException e) {
+            logger.error("There was an error", e);
+            throw new DBException("Unexpected database error", e);
+        }
+        return result;
+    }
+
     public static List<HashMap> getAllCoursesWithTeacher() throws DBException {
         List<HashMap> courses = new ArrayList<>();
         try(Connection connection = ConnectionPool.getConnection();
